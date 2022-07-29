@@ -1772,14 +1772,14 @@
 //
 //   <i> Assigns specified pin number to GREEN_LED
 #ifndef GREEN_LED
- #define GREEN_LED       3
+ #define GREEN_LED       2
 #endif
 // <o>BLUE_LED <0-15>
 // ===============================
 //
 //   <i> Assigns specified pin number to BLUE_LED
 #ifndef BLUE_LED
- #define BLUE_LED       7
+ #define BLUE_LED       2
 #endif
 // </h>
 #endif    /* RTE_DEVICE_H */
