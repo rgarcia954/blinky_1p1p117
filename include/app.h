@@ -146,6 +146,12 @@ extern "C"
         { 0xFF, false, NULL }
 */
 
+/* Hardware platforms */
+#define MEZZ_HARDWARE                 0
+#define PCBA_HARDWARE                 1
+
+#define APP_PLATFORM                    PCBA_HARDWARE
+
 /* ----------------------------------------------------------------------------
  * Global variables and types
  * --------------------------------------------------------------------------*/
