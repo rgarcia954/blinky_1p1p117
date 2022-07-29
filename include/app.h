@@ -44,7 +44,7 @@ extern "C"
 
 /* GPIO number that is used for Debug Catch Mode
  * to easily connect the device to the debugger */
-#define DEBUG_CATCH_GPIO                0
+#define DEBUG_CATCH_GPIO                7
 
 /* GPIO number that is acting as LED of EVB */
 #define TIMER0_STATES_GPIO              GREEN_LED
@@ -62,7 +62,7 @@ extern "C"
 /* Enable/disable buck converter
  * Options: VCC_BUCK or VCC_LDO
  */
-#define VCC_BUCK_LDO_CTRL               VCC_LDO
+#define VCC_BUCK_LDO_CTRL               VCC_BUCK
 
 /* To set Timer0 interrupt interval to 200 ms
  * Assumptions:
