@@ -17,6 +17,9 @@
 
 #include "app.h"
 
+#define XTAL32K_CTRIM_21P6PF    ((uint32_t)(0x36U << ACS_XTAL32K_CTRL_CLOAD_TRIM_Pos))
+#define XTAL32K_CTRIM_6P8PF    ((uint32_t)(0x11U << ACS_XTAL32K_CTRL_CLOAD_TRIM_Pos))
+
 /* Global variables */
 volatile uint8_t led_toggle_status;
 DRIVER_GPIO_t *gpio;
@@ -177,6 +180,26 @@ void util_rmw(volatile uint32_t *addr, const uint32_t mask, const uint32_t set)
 }
 
 /**
+ * @brief Initializes System Clock
+ */
+void App_XTAL32K_Config(void)
+{
+//    Sys_PowerModes_XTAL_ClockInit(&(app_sleep_mode_cfg.clock_cfg));
+
+    /* Enable XTAL32k */
+#if APP_PLATFORM == MEZZ_HARDWARE
+    ACS->XTAL32K_CTRL = XTAL32K_XIN_CAP_BYPASS_DISABLE | XTAL32K_NOT_FORCE_READY | XTAL32K_CTRIM_21P6PF |
+                        XTAL32K_ITRIM_160NA | XTAL32K_ENABLE | XTAL32K_AMPL_CTRL_ENABLE;
+#else
+    ACS->XTAL32K_CTRL = XTAL32K_XIN_CAP_BYPASS_DISABLE | XTAL32K_NOT_FORCE_READY | XTAL32K_CTRIM_6P8PF |
+                        XTAL32K_ITRIM_160NA | XTAL32K_ENABLE | XTAL32K_AMPL_CTRL_ENABLE;
+#endif
+
+    /* Wait for XTAL32k to be configured */
+    while (ACS->XTAL32K_CTRL && ((0x1U << ACS_XTAL32K_CTRL_READY_Pos) != XTAL32K_OK));
+}
+
+/**
  * @brief The main entry point for the program
  */
 int main(void)
@@ -186,6 +209,8 @@ int main(void)
 
     /* Initialize the system */
     Initialize();
+
+    App_XTAL32K_Config();
 
     hw_set_aout(AOUT_VLAUE);
 
