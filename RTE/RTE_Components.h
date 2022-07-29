@@ -2,8 +2,8 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: blinky
- * RTE configuration: blinky.rteconfig
+ * Project: blinky_1p1p117
+ * RTE configuration: blinky_1p1p117.rteconfig
 */
 #ifndef RTE_COMPONENTS_H
 #define RTE_COMPONENTS_H
