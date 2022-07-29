@@ -118,6 +118,64 @@ void Initialize(void)
     __set_FAULTMASK(FAULTMASK_ENABLE_INTERRUPTS);
 }
 
+/*
+ * @brief Set AOUT to export analog signals
+ * @return Zero
+ */
+void hw_set_aout(const uint8_t value)
+{
+    /* Shift value into mode bit position... */
+    uint32_t test_aout = ((uint32_t) value) << ACS_AOUT_CTRL_TEST_AOUT_Pos;
+    uint32_t test_mask = ACS_AOUT_CTRL_TEST_AOUT_Mask;
+
+    /* Add the selected DIO... */
+    test_aout |= (HW_GPIO_AOUT << ACS_AOUT_CTRL_AOUT_TO_GPIO_Pos);
+    test_mask |= ACS_AOUT_CTRL_AOUT_TO_GPIO_Mask;
+
+    /* Set the voltage/current select bit except for THERMISTOR_CURRENT... */
+    test_aout |= ((value == AOUT_THERMISTOR_CURRENT ? 0 : 1) << ACS_AOUT_CTRL_AOUT_IOUT_SEL_TO_GPIO_Pos);
+    test_mask |= (1 << ACS_AOUT_CTRL_AOUT_IOUT_SEL_TO_GPIO_Pos);
+
+    /* Configure DIO for A-OUT... */
+    SYS_GPIO_CONFIG(HW_GPIO_AOUT, GPIO_MODE_DISABLE | GPIO_LPF_DISABLE | GPIO_WEAK_PULL_DOWN  | GPIO_6X_DRIVE);
+    SYS_GPIO_CONFIG(HW_GPIO_AOUT, GPIO_MODE_DISABLE | GPIO_LPF_DISABLE | GPIO_NO_PULL  | GPIO_6X_DRIVE);
+
+    /* Read/modify/write configuration register... */
+    util_rmw((uint32_t *) ACS_AOUT_CTRL, test_mask, test_aout);
+    return;
+}
+
+/**
+ * Read/Modify/Write a 32-bit register..
+ *
+ * This routine performs a Read/Modify/Write operation on a 32-bit address.
+ * The current value of the register is first AND'd with the 'mask' to clear
+ * any fields being modified, and then OR'd with the 'set' to set the field
+ * values.
+ *
+ * @param addr  [out] Pointer to 32-bit register to be modified.
+ * @param mask  [in]  Bitmask of fields being modified.
+ * @param set   [in]  Bits to be set within the bitmask.
+ *
+ * @return None.
+ */
+void util_rmw(volatile uint32_t *addr, const uint32_t mask, const uint32_t set)
+{
+    /* Bit to be set must exist within the mask... */
+    uint32_t bitset = set & mask;
+
+    /* READ the current value... */
+    volatile uint32_t   value = *addr;
+
+    /* MODIFY by ANDing with the mask and ORing with the set... */
+    value &= (~mask);
+    value |= bitset;
+
+    /* WRITE the new value... */
+    *addr = value;
+    return;
+}
+
 /**
  * @brief The main entry point for the program
  */
@@ -129,6 +187,9 @@ int main(void)
     /* Initialize the system */
     Initialize();
 
+    hw_set_aout(AOUT_VLAUE);
+
+#if 0
     /* Configure and start Timer 0 with a period of 200 ms */
     Sys_Timer_Config(TIMER0, TIMER_PRESCALE_8 , TIMER_FREE_RUN, TIMER0_TIMEOUT_VAL_SETTING);
     Sys_Timer_Start(TIMER0);
@@ -148,7 +209,7 @@ int main(void)
 
     /* Initialize GPIO driver */
     gpio->Initialize(Button_EventCallback);
-
+#endif
 
     /* Main application spin loop */
     while (1)
